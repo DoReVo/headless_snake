@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import Joi from "joi";
-import { generateFruitPosition } from "./utility";
+import { generateFruitPosition } from "./lib/game";
 import { nanoid } from "nanoid";
 import { NEW_GAME_SCHEMA, VALIDATE_GAME_SCHEMA } from "./lib/schemas";
 import { clientStateValidation } from "./lib/state-validation";
