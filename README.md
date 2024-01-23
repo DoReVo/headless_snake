@@ -1,5 +1,5 @@
 # Access live version
-Go to `https://snake-api.izzatfaris.site/`
+Go to [https://snake-api.izzatfaris.site/](https://snake-api.izzatfaris.site/)
 
 # Running the project
 
