@@ -1,4 +1,4 @@
-import { GameValidationLogicError } from "./errors";
+import { GameLogicValidationError } from "./errors";
 
 interface HeightWidthVerification {
   width: State["width"];
@@ -13,30 +13,33 @@ function verifyWidthHeightMatch(
   database: HeightWidthVerification
 ) {
   if (client.height !== database.height)
-    throw new GameValidationLogicError(
+    throw new GameLogicValidationError(
       `Height does not match. Given '${client.height}' while in database '${database.height}'`
     );
 
   if (client.width !== database.width)
-    throw new GameValidationLogicError(
+    throw new GameLogicValidationError(
       `Width does not match. Given '${client.width}' while in database '${database.width}'`
     );
 
   return true;
 }
 
+/** Validate client game state
+ * and return game state that we stored in DB
+ */
 export async function clientStateValidation(
   clientState: State,
   db: KVNamespace
 ) {
   const gameId = clientState.gameId;
 
-  // Make sure client give us a gameId that is actually
+  // Make sure client gave us a gameId that is actually
   // in the database
   const gameState: State | null = await db.get(`game_state_${gameId}`, "json");
 
   if (!gameState)
-    throw new GameValidationLogicError(`Game ID '${gameId}' not found`);
+    throw new GameLogicValidationError(`Game ID '${gameId}' not found`);
 
   // We could just stop validation here.
   // Because, all we care about is actually just the `ticks`.
@@ -61,4 +64,6 @@ export async function clientStateValidation(
       width: gameState.width,
     }
   );
+
+  return gameState;
 }
