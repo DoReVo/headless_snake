@@ -1,4 +1,4 @@
-export class GameValidationLogicError extends Error {
+export class GameLogicValidationError extends Error {
   constructor(msg: string) {
     super(msg);
   }
