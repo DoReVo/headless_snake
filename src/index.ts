@@ -25,8 +25,12 @@ app.get("/", (context) => {
   });
 });
 
-app.get("/new", async (c) => {
+app.all("/new", async (c) => {
   try {
+    // Only GET request is allowed
+    if (c.req.method !== "GET")
+      throw new InvalidHttpMethodError("Invalid method");
+
     // Validate query params
     const queryParams = await NEW_GAME_SCHEMA.validateAsync(c.req.query());
 
@@ -35,6 +39,7 @@ app.get("/new", async (c) => {
     // Generate a fruit position for the game
     const fruit = generateFruitPosition(width, height);
 
+    // Give the game an ID
     const gameId = nanoid();
 
     // Create new game state
@@ -58,7 +63,12 @@ app.get("/new", async (c) => {
       c.status(400);
 
       return c.json({ error: { message: error?.message } });
+    } else if (error instanceof InvalidHttpMethodError) {
+      c.status(405);
+
+      return c.json({ error: { message: "Invalid Method" } });
     }
+
     // Unrecognized errors
     else {
       console.log("Unrecognized error", error);
