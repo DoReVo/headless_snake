@@ -4,16 +4,25 @@ import {
   SnakeOutOfBoundError,
 } from "./errors";
 
+/**
+ * Given a game arena height and width,
+ * generate a fruit inside the arena
+ */
 export function generateFruitPosition(
   width: State["width"],
   height: State["height"]
 ): Fruit {
+  // TODO: Enhanced so that fruit is not generate "on" the wall
+  // of the arena
   const x = Math.floor(Math.random() * width);
   const y = Math.floor(Math.random() * height);
 
   return { x, y };
 }
 
+/**
+ * Make sure 180-degree turn is not allowed
+ */
 function checkIsNot180DegreeTurn(
   currentVelX: Velocity,
   currentVelY: Velocity,
@@ -59,6 +68,9 @@ function checkIsNot180DegreeTurn(
   return true;
 }
 
+/**
+ * Check whether the snake is still in the arena
+ */
 function checkSnakeInArena(
   currentX: Snake["x"],
   currentY: Snake["y"],
@@ -73,6 +85,9 @@ function checkSnakeInArena(
   return true;
 }
 
+/**
+ * Check if the snake is on a fruit
+ */
 function checkIfFoundFruit(
   currentX: Snake["x"],
   currentY: Snake["y"],
@@ -83,6 +98,7 @@ function checkIfFoundFruit(
   return false;
 }
 
+/** Run a list of moves against a game state */
 export function runGame(gameState: State, clientTicks: Tick[]): State {
   // Snake current velocity
   let currentVelX = gameState.snake.velX;
@@ -144,12 +160,17 @@ export function runGame(gameState: State, clientTicks: Tick[]): State {
   if (!fruitFound)
     throw new FruitNotFoundError("Ticks does not lead to a fruit");
 
+  // Generate a new fruit position in the arena
   const newFruit = generateFruitPosition(gameState.width, gameState.height);
 
+  // Everything run ok, the list of moves lead
+  // to a fruit, thus we're updating the game state
+  // with a new one
   const newGameState: State = {
     ...gameState,
     // Increment score by 1
     score: gameState.score + 1,
+    // New fruit
     fruit: newFruit,
     snake: {
       x: currentX,
