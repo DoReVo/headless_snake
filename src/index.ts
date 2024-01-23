@@ -44,6 +44,8 @@ app.get("/new", async (c) => {
 
     // Save game state
     await c.env.SNAKE_DB.put(`game_state_${gameId}`, JSON.stringify(game));
+
+    return c.json(game);
   } catch (error) {
     // Query params validation error
     if (Joi.isError(error)) {
@@ -61,8 +63,6 @@ app.get("/new", async (c) => {
       });
     }
   }
-
-  return c.json({ message: "Yes" });
 });
 
 app.post("/validate", async (c) => {
