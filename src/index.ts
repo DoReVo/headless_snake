@@ -7,6 +7,7 @@ import { clientStateValidation } from "./lib/state-validation";
 import {
   FruitNotFoundError,
   GameLogicValidationError,
+  InvalidHttpMethodError,
   SnakeOutOfBoundError,
 } from "./lib/errors";
 import { runGame } from "./lib/game";
@@ -70,8 +71,12 @@ app.get("/new", async (c) => {
   }
 });
 
-app.post("/validate", async (c) => {
+app.all("/validate", async (c) => {
   try {
+    // Only POST request is allow
+    if (c.req.method !== "POST")
+      throw new InvalidHttpMethodError("Invalid method");
+
     // Basic validation to make sure the data is in
     // the shape that we expect
     const body = await VALIDATE_GAME_SCHEMA.validateAsync(await c.req.json());
@@ -80,6 +85,7 @@ app.post("/validate", async (c) => {
     // given by the client match with what we have stored in DB
     const gameState = await clientStateValidation(body, c.env.SNAKE_DB);
 
+    // Given the list of moves by the client, run the game against it.
     const newGameState = runGame(gameState, body.ticks);
 
     // Save new state
@@ -123,6 +129,10 @@ app.post("/validate", async (c) => {
           message: error?.message,
         },
       });
+    } else if (error instanceof InvalidHttpMethodError) {
+      c.status(405);
+
+      return c.json({ error: { message: "Invalid Method" } });
     }
 
     // Unrecognized errors

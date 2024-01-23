@@ -19,3 +19,9 @@ export class FruitNotFoundError extends GameLogicValidationError {
     super(msg);
   }
 }
+
+export class InvalidHttpMethodError extends Error {
+  constructor(msg: string) {
+    super(msg);
+  }
+}
