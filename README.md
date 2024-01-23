@@ -1,5 +1,11 @@
 # Access live version
+
 Go to [https://snake-api.izzatfaris.site/](https://snake-api.izzatfaris.site/)
+
+# Tech stack
+- Typescript
+- Deployed on Cloudflare Worker
+- [Hono](https://hono.dev/) as the routing library
 
 # Running the project
 
