@@ -3,6 +3,8 @@ import Joi from "joi";
 import { generateFruitPosition } from "./utility";
 import { nanoid } from "nanoid";
 import { NEW_GAME_SCHEMA, VALIDATE_GAME_SCHEMA } from "./lib/schemas";
+import { clientStateValidation } from "./lib/state-validation";
+import { GameValidationLogicError } from "./lib/errors";
 
 type Bindings = {
   SNAKE_DB: KVNamespace;
@@ -69,6 +71,10 @@ app.post("/validate", async (c) => {
     // the shape that we expect
     const body = await VALIDATE_GAME_SCHEMA.validateAsync(await c.req.json());
 
+    // Validation to make sure the state
+    // given by the client match with what we have stored in DB
+    await clientStateValidation(body, c.env.SNAKE_DB);
+
     return c.json({ message: "ok" });
   } catch (error) {
     // Body validation failure
@@ -76,6 +82,14 @@ app.post("/validate", async (c) => {
       c.status(400);
 
       return c.json({ error: { message: error?.message } });
+    } else if (error instanceof GameValidationLogicError) {
+      console.error("Game validation logic error", error);
+
+      return c.json({
+        error: {
+          message: error?.message,
+        },
+      });
     }
 
     // Unrecognized errors
